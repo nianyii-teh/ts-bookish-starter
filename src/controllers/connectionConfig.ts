@@ -1,3 +1,6 @@
+import { rejects } from "assert";
+import { resolve } from "path";
+
 const Connection = require('tedious').Connection;
 const RequestStatement = require('tedious').Request;
 let connection;
@@ -28,7 +31,6 @@ export function setupConnection(portVal){
         }
 
         console.log("Connected successfully");
-        //executeStatement();
     });
 
     connection.connect();
@@ -37,7 +39,6 @@ export function setupConnection(portVal){
 
 
 export function executeStatement(sqlQuery: string){
-    console.log("Connection Established");
     let request = new RequestStatement(sqlQuery, function(err, rowCount){
         if(err){
             console.log(err);
@@ -45,13 +46,22 @@ export function executeStatement(sqlQuery: string){
             console.log(rowCount + " rows");
         }
     });
-    connection.execSql(request);
-    return request;
-    // request.on('row', function(columns){
-    //     console.log(columns);
-    //     columns.forEach(column => {
-    //         console.log(column.value);
-    //     });
-    // });
-    
+
+    return new Promise((resolve, reject) => {
+      const result = [];
+
+      request.on('row', (columns) => {
+        const entry = {};
+        columns.forEach((column) => {
+          entry[column.metadata.colName] = column.value;
+        });
+        result.push(entry);
+      });
+
+      request.on('error', error => rejects(error));
+      request.on('doneProc', () => resolve(result));
+      
+
+      connection.execSql(request);
+    });
 }
