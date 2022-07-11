@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { TYPES } from 'tedious';
 import { connectionManager } from './connectionConfig';
 import Book from '../bookClass';
+import Author from '../authorClass';
 
 class BookController {
     router: Router;
@@ -29,18 +30,29 @@ class BookController {
         }
 
         const queryStatement = connectionManager.createStatement(
-            'SELECT * FROM Books WHERE ID = @id',
+            'SELECT * FROM Books JOIN Book_Authors on Books.id = Book_Authors.book_id_val JOIN Authors on Book_Authors.author_id_val = Authors.id WHERE Books.ID = @id',
         );
         queryStatement.addParameter('id', TYPES.Int, id);
         const data = [];
-        const result = connectionManager
+        connectionManager
             .executeStatement(queryStatement)
             .then((rows: Array<Record<string, any>>) => {
                 // console.log(rows);
 
                 rows.forEach((row) => {
+                    const author: Author = new Author(
+                        row.author_id_val,
+                        row.firstname,
+                        row.lastname,
+                    );
                     data.push(
-                        new Book(row.id, row.title, row.isbn, row.copies_owned),
+                        new Book(
+                            row.id,
+                            row.title,
+                            row.isbn,
+                            row.copies_owned,
+                            author,
+                        ),
                     );
                 });
 
