@@ -10,8 +10,14 @@ class BookController {
         this.router = Router();
         this.router.get('/getBook/:id', this.getBook.bind(this));
         this.router.get('/getAllBooks', this.getAllBooks.bind(this));
-        this.router.get('/getAllBooksAlphabetically', this.getBooksAlphabetically.bind(this));
-        this.router.get('/getCheckedOutBooks', this.getCheckedOutBooks.bind(this));
+        this.router.get(
+            '/getAllBooksAlphabetically',
+            this.getBooksAlphabetically.bind(this),
+        );
+        this.router.get(
+            '/getCheckedOutBooks',
+            this.getCheckedOutBooks.bind(this),
+        );
 
         this.router.post('/', this.createBook.bind(this));
     }
@@ -25,24 +31,30 @@ class BookController {
     }
 
     getAllBooks(req: Request, res: Response) {
-        const queryStatement: string = 'SELECT * FROM Books';
-        let data = {};
-        const result = executeStatement(queryStatement).then((rows: Array<Record<string, any>>) => {
-            console.log(rows);
-            
-            rows.forEach(row => {
-                data[row.id] = new Book(row.id, row.title, row.isbn, row.copies_owned);
-            });
+        const queryStatement = 'SELECT * FROM Books';
+        const data = {};
+        const result = executeStatement(queryStatement)
+            .then((rows: Array<Record<string, any>>) => {
+                console.log(rows);
 
-            return res.status(200).json({
-                status: 200,
-                data: data
+                rows.forEach((row) => {
+                    data[row.id] = new Book(
+                        row.id,
+                        row.title,
+                        row.isbn,
+                        row.copies_owned,
+                    );
+                });
+
+                return res.status(200).json({
+                    status: 200,
+                    data: data,
+                });
+            })
+            .catch((error) => {
+                console.log(error);
             });
-        }).catch((error) => {
-            console.log(error);
-        });
     }
-
 
     createBook(req: Request, res: Response) {
         // TODO: implement functionality
@@ -54,42 +66,57 @@ class BookController {
 
     getCheckedOutBooks(req: Request, res: Response) {
         // TODO: implement functionality
-        const queryStatement: string = 'SELECT * FROM Books JOIN User_Books on Books.id = User_Books.book_id_val JOIN Users on User_Books.user_id_val = Users.id WHERE User_Books.returned_date is NULL;';
-        let data = {};
-        const result = executeStatement(queryStatement).then((rows: Array<Record<string, any>>) => {
-            console.log(rows);
-            
-            rows.forEach(row => {
-                data[row.id] = new Book(row.id, row.title, row.isbn, row.copies_owned);
-            });
+        const queryStatement =
+            'SELECT * FROM Books JOIN User_Books on Books.id = User_Books.book_id_val JOIN Users on User_Books.user_id_val = Users.id WHERE User_Books.returned_date is NULL;';
+        const data = {};
+        const result = executeStatement(queryStatement)
+            .then((rows: Array<Record<string, any>>) => {
+                console.log(rows);
 
-            return res.status(200).json({
-                status: 200,
-                data: data
+                rows.forEach((row) => {
+                    data[row.id] = new Book(
+                        row.id,
+                        row.title,
+                        row.isbn,
+                        row.copies_owned,
+                    );
+                });
+
+                return res.status(200).json({
+                    status: 200,
+                    data: data,
+                });
+            })
+            .catch((error) => {
+                console.log(error);
             });
-        }).catch((error) => {
-            console.log(error);
-        });
     }
 
     getBooksAlphabetically(req: Request, res: Response) {
         // TODO: implement functionality
-        const queryStatement: string = 'SELECT * FROM Books ORDER BY Title ASC';
-        let data = {};
-        const result = executeStatement(queryStatement).then((rows: Array<Record<string, any>>) => {
-            console.log(rows);
-            
-            rows.forEach(row => {
-                data[row.id] = new Book(row.id, row.title, row.isbn, row.copies_owned);
-            });
+        const queryStatement = 'SELECT * FROM Books ORDER BY Title ASC';
+        const data = {};
+        const result = executeStatement(queryStatement)
+            .then((rows: Array<Record<string, any>>) => {
+                console.log(rows);
 
-            return res.status(200).json({
-                status: 200,
-                data: data
+                rows.forEach((row) => {
+                    data[row.id] = new Book(
+                        row.id,
+                        row.title,
+                        row.isbn,
+                        row.copies_owned,
+                    );
+                });
+
+                return res.status(200).json({
+                    status: 200,
+                    data: data,
+                });
+            })
+            .catch((error) => {
+                console.log(error);
             });
-        }).catch((error) => {
-            console.log(error);
-        });
     }
 
     getBooksByTitle(req: Request, res: Response) {
@@ -115,7 +142,6 @@ class BookController {
             error_description: 'Endpoint not implemented yet.',
         });
     }
-
 }
 
 export default new BookController().router;
