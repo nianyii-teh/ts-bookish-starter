@@ -1,9 +1,7 @@
-import { rejects } from 'assert';
-import { Connection, Request as RequestStatement } from 'tedious';
-//const Connection = require('tedious').Connection;
+import { Connection } from 'tedious';
+import { Request as RequestStatement } from 'tedious';
 
 let connection;
-
 const config = {
     server: 'localhost',
     authentication: {
@@ -17,7 +15,6 @@ const config = {
         port: 1433,
         database: 'bookish',
         trustServerCertificate: true,
-        rowCollectionOnRequestCompletion: true,
     },
 };
 
@@ -36,7 +33,7 @@ export function setupConnection() {
     connection.connect();
 }
 
-export function executeStatement(sqlQuery: string) {
+export function createStatement(sqlQuery: string) {
     const request = new RequestStatement(sqlQuery, function (err, rowCount) {
         if (err) {
             console.log(err);
@@ -44,7 +41,10 @@ export function executeStatement(sqlQuery: string) {
             console.log(rowCount + ' rows');
         }
     });
+    return request;
+}
 
+export function executeStatement(request: RequestStatement) {
     return new Promise((resolve, reject) => {
         const result = [];
 
