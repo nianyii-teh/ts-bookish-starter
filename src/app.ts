@@ -7,7 +7,7 @@ import { setupConnection } from './controllers/connectionConfig';
 
 const port = process.env['PORT'] || 3000;
 
-setupConnection(port);
+setupConnection();
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));

@@ -8,8 +8,8 @@ class BookController {
 
     constructor() {
         this.router = Router();
-        this.router.get('/getBook/:id', this.getBook.bind(this));
-        this.router.get('/getAllBooks', this.getAllBooks.bind(this));
+        this.router.get('/:id', this.getBook.bind(this));
+        this.router.get('/', this.getAllBooks.bind(this));
 
         this.router.post('/', this.createBook.bind(this));
     }
@@ -39,12 +39,12 @@ class BookController {
                 });
 
                 return res.status(200).json({
-                    status: 200,
                     data: data,
                 });
             })
             .catch((error) => {
                 console.log(error);
+                return res.status(500);
             });
     }
 
