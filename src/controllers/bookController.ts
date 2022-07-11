@@ -120,10 +120,29 @@ class BookController {
 
     createBook(req: Request, res: Response) {
         // TODO: implement functionality
-        return res.status(500).json({
-            error: 'server_error',
-            error_description: 'Endpoint not implemented yet.',
-        });
+        console.log(req.query);
+
+        const queryStatement = connectionManager.createStatement(
+            'INSERT INTO Books(title, isbn, copies_owned) VALUES (@title, @isbn, @copies_owned)',
+        );
+        queryStatement.addParameter('title', TYPES.VarChar, req.query.title);
+        queryStatement.addParameter('isbn', TYPES.VarChar, req.query.isbn);
+        queryStatement.addParameter(
+            'copies_owned',
+            TYPES.Int,
+            req.query.copies_owned,
+        );
+
+        connectionManager
+            .executeStatement(queryStatement)
+            .then(() => {
+                return res.status(200).json({
+                    description: 'Success',
+                });
+            })
+            .catch((error) => {
+                return res.status(500);
+            });
     }
 
     getCheckedOutBooks(req: Request, res: Response) {
