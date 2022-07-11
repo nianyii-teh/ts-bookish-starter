@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { Connection, Request as RequestStatement, TYPES } from 'tedious';
-import { executeStatement, createStatement } from './connectionConfig';
+import { TYPES } from 'tedious';
+import { connectionManager } from './connectionConfig';
 import Book from '../bookClass';
 
 class BookController {
@@ -8,7 +8,6 @@ class BookController {
 
     constructor() {
         this.router = Router();
-        this.router.get('/:id', this.getBook.bind(this));
         this.router.get('/', this.getAllBooks.bind(this));
         this.router.get(
             '/alphabetical',
@@ -17,6 +16,7 @@ class BookController {
         this.router.get('/checkedOut', this.getCheckedOutBooks.bind(this));
         this.router.get('/title/:title', this.getBooksByTitle.bind(this));
         this.router.get('/author/:author', this.getBooksByAuthor.bind(this));
+        this.router.get('/:id', this.getBook.bind(this));
 
         this.router.post('/', this.createBook.bind(this));
     }
@@ -28,21 +28,19 @@ class BookController {
             return res.status(400);
         }
 
-        const queryStatement = createStatement(
+        const queryStatement = connectionManager.createStatement(
             'SELECT * FROM Books WHERE ID = @id',
         );
         queryStatement.addParameter('id', TYPES.Int, id);
-        const data = {};
-        const result = executeStatement(queryStatement)
+        const data = [];
+        const result = connectionManager
+            .executeStatement(queryStatement)
             .then((rows: Array<Record<string, any>>) => {
-                console.log(rows);
+                // console.log(rows);
 
                 rows.forEach((row) => {
-                    data[row.id] = new Book(
-                        row.id,
-                        row.title,
-                        row.isbn,
-                        row.copies_owned,
+                    data.push(
+                        new Book(row.id, row.title, row.isbn, row.copies_owned),
                     );
                 });
 
@@ -65,17 +63,15 @@ class BookController {
 
     getAllBooks(req: Request, res: Response) {
         const queryStatement = 'SELECT * FROM Books';
-        const data = {};
-        const result = executeStatement(queryStatement)
+        const data = [];
+        const result = connectionManager
+            .executeStatement(connectionManager.createStatement(queryStatement))
             .then((rows: Array<Record<string, any>>) => {
                 console.log(rows);
 
                 rows.forEach((row) => {
-                    data[row.id] = new Book(
-                        row.id,
-                        row.title,
-                        row.isbn,
-                        row.copies_owned,
+                    data.push(
+                        new Book(row.id, row.title, row.isbn, row.copies_owned),
                     );
                 });
 
@@ -91,17 +87,15 @@ class BookController {
     getBooksAlphabetically(req: Request, res: Response) {
         // TODO: implement functionality
         const queryStatement = 'SELECT * FROM Books ORDER BY Title ASC';
-        const data = {};
-        const result = executeStatement(queryStatement)
+        const data = [];
+        const result = connectionManager
+            .executeStatement(connectionManager.createStatement(queryStatement))
             .then((rows: Array<Record<string, any>>) => {
                 console.log(rows);
 
                 rows.forEach((row) => {
-                    data[row.id] = new Book(
-                        row.id,
-                        row.title,
-                        row.isbn,
-                        row.copies_owned,
+                    data.push(
+                        new Book(row.id, row.title, row.isbn, row.copies_owned),
                     );
                 });
 
@@ -126,17 +120,15 @@ class BookController {
         // TODO: implement functionality
         const queryStatement =
             'SELECT * FROM Books JOIN User_Books on Books.id = User_Books.book_id_val JOIN Users on User_Books.user_id_val = Users.id WHERE User_Books.returned_date is NULL;';
-        const data = {};
-        const result = executeStatement(queryStatement)
+        const data = [];
+        const result = connectionManager
+            .executeStatement(queryStatement)
             .then((rows: Array<Record<string, any>>) => {
                 console.log(rows);
 
                 rows.forEach((row) => {
-                    data[row.id] = new Book(
-                        row.id,
-                        row.title,
-                        row.isbn,
-                        row.copies_owned,
+                    data.push(
+                        new Book(row.id, row.title, row.isbn, row.copies_owned),
                     );
                 });
 
