@@ -37,8 +37,6 @@ class BookController {
         connectionManager
             .executeStatement(queryStatement)
             .then((rows: Array<Record<string, any>>) => {
-                // console.log(rows);
-
                 rows.forEach((row) => {
                     const author: Author = new Author(
                         row.author_id_val,
