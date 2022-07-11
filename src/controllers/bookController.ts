@@ -23,24 +23,30 @@ class BookController {
     }
 
     getAllBooks(req: Request, res: Response) {
-        const queryStatement: string = 'SELECT * FROM Books';
-        let data = {};
-        const result = executeStatement(queryStatement).then((rows: Array<Record<string, any>>) => {
-            console.log(rows);
-            
-            rows.forEach(row => {
-                data[row.id] = new Book(row.id, row.title, row.isbn, row.copies_owned);
-            });
+        const queryStatement = 'SELECT * FROM Books';
+        const data = {};
+        const result = executeStatement(queryStatement)
+            .then((rows: Array<Record<string, any>>) => {
+                console.log(rows);
 
-            return res.status(200).json({
-                status: 200,
-                data: data
+                rows.forEach((row) => {
+                    data[row.id] = new Book(
+                        row.id,
+                        row.title,
+                        row.isbn,
+                        row.copies_owned,
+                    );
+                });
+
+                return res.status(200).json({
+                    status: 200,
+                    data: data,
+                });
+            })
+            .catch((error) => {
+                console.log(error);
             });
-        }).catch((error) => {
-            console.log(error);
-        });
     }
-
 
     createBook(req: Request, res: Response) {
         // TODO: implement functionality
