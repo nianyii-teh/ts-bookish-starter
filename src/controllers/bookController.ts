@@ -119,9 +119,6 @@ class BookController {
     }
 
     createBook(req: Request, res: Response) {
-        // TODO: implement functionality
-        console.log(req.query);
-
         const queryStatement = connectionManager.createStatement(
             'INSERT INTO Books(title, isbn, copies_owned) VALUES (@title, @isbn, @copies_owned)',
         );
@@ -147,8 +144,9 @@ class BookController {
 
     getCheckedOutBooks(req: Request, res: Response) {
         // TODO: implement functionality
-        const queryStatement =
-            'SELECT * FROM Books JOIN User_Books on Books.id = User_Books.book_id_val JOIN Users on User_Books.user_id_val = Users.id WHERE User_Books.returned_date is NULL;';
+        const queryStatement = connectionManager.createStatement(
+            'SELECT * FROM Books JOIN User_Books on Books.id = User_Books.book_id_val JOIN Users on User_Books.user_id_val = Users.id WHERE User_Books.returned_date is NULL;',
+        );
         const data = [];
         const result = connectionManager
             .executeStatement(queryStatement)
@@ -166,7 +164,9 @@ class BookController {
                 });
             })
             .catch((error) => {
-                return res.status(500);
+                return res.status(500).json({
+                    error: error,
+                });
             });
     }
 
