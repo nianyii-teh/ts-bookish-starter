@@ -1,5 +1,3 @@
-import { rejects } from 'assert';
-import { resolve } from 'path';
 import { Connection } from 'tedious';
 import { Request as RequestStatement } from 'tedious';
 
@@ -66,7 +64,7 @@ class ConnectionManager {
                 result.push(entry);
             });
 
-            request.on('error', (error) => rejects(error));
+            request.on('error', (error) => reject(error));
             request.on('doneProc', () => resolve(result));
 
             this.connection.execSql(request);
