@@ -3,11 +3,9 @@ import 'dotenv/config';
 
 import healthcheckRoutes from './controllers/healthcheckController';
 import bookRoutes from './controllers/bookController';
-import { setupConnection } from './controllers/connectionConfig';
+import { connectionManager } from './controllers/connectionConfig';
 
 const port = process.env['PORT'] || 3000;
-
-setupConnection();
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
